@@ -38,7 +38,7 @@ const DEFAULT_FORM: ProductFormData = {
 };
 
 export default function NewProductPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user, isAdmin } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState<ProductFormData>(DEFAULT_FORM);
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -94,14 +94,14 @@ export default function NewProductPage() {
     setError('');
     setSaving(true);
     try {
-      createProduct(form, images, video);
+      createProduct(form, images, video, user?.username || '', !isAdmin);
       router.push('/products');
     } catch {
       setError('保存失败，请重试');
     } finally {
       setSaving(false);
     }
-  }, [form, images, video, router]);
+  }, [form, images, video, router, user, isAdmin]);
 
   // Drag & Drop
   const dragItem = useRef<number | null>(null);

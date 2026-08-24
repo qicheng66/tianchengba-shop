@@ -6,6 +6,9 @@ export type PriceZone = '正价' | '特价';
 
 export type ProductStatus = '在售' | '售罄';
 
+// 审核状态
+export type ReviewStatus = '待审核' | '已通过' | '已打回';
+
 export interface ProductImage {
   id: string;
   data: string; // base64 data URL
@@ -35,6 +38,15 @@ export interface Product {
   status: ProductStatus; // 状态
   remark: string; // 备注
   sortOrder: number; // 排序权重
+  // 审核相关
+  reviewStatus: ReviewStatus; // 审核状态
+  createdBy: string; // 创建者用户名
+  reviewedBy?: string; // 审核者用户名
+  reviewedAt?: number; // 审核时间
+  rejectReason?: string; // 打回原因
+  // 优推相关
+  isFeatured: boolean; // 是否优推
+  featuredOrder: number; // 优推排序（1=优推1，2=优推2...）
   createdAt: number; // 创建时间戳
   updatedAt: number; // 更新时间戳
 }
@@ -60,10 +72,28 @@ export const PRICE_ZONE_OPTIONS: PriceZone[] = ['正价', '特价'];
 
 export const STATUS_OPTIONS: ProductStatus[] = ['在售', '售罄'];
 
-// 认证相关
+export const REVIEW_STATUS_OPTIONS: ReviewStatus[] = ['待审核', '已通过', '已打回'];
+
+// ============ 用户与账号 ============
+export type UserRole = 'admin' | 'operator';
+
+export interface UserAccount {
+  id: string;
+  username: string; // 用户名（登录用）
+  displayName: string; // 显示名称
+  password: string; // 密码（明文存储，纯前端）
+  role: UserRole;
+  phone?: string; // 手机号
+  enabled: boolean; // 是否启用
+  createdAt: number;
+}
+
 export interface User {
-  phone: string;
-  name: string;
+  id: string;
+  username: string;
+  displayName: string;
+  role: UserRole;
+  phone?: string;
 }
 
 export interface AuthState {
@@ -79,4 +109,6 @@ export interface DashboardStats {
   regularPriceCount: number;
   salePriceCount: number;
   styleCounts: Record<StyleType, number>;
+  pendingReviewCount: number;
+  featuredCount: number;
 }

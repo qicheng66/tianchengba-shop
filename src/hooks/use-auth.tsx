@@ -8,7 +8,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (phone: string, password: string) => { success: boolean; error?: string };
+  isAdmin: boolean;
+  login: (username: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
 }
 
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
+  isAdmin: false,
   login: () => ({ success: false }),
   logout: () => {},
 });
@@ -34,8 +36,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((phone: string, password: string) => {
-    const result = storeLogin(phone, password);
+  const login = useCallback((username: string, password: string) => {
+    const result = storeLogin(username, password);
     if (result.success && result.user) {
       setUser(result.user);
       setIsAuthenticated(true);
@@ -49,8 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(false);
   }, []);
 
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

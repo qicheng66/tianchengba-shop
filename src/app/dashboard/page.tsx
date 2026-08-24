@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import AppLayout from '@/components/layout/app-layout';
-import { getDashboardStats } from '@/lib/store';
+import { getDashboardStats, getPendingReviewProducts, getAllAccounts } from '@/lib/store';
 import { DashboardStats } from '@/lib/types';
 import {
   Package,
@@ -13,13 +13,18 @@ import {
   Tag,
   Percent,
   ArrowRight,
+  Clock,
+  Users,
+  Star,
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isAdmin } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [accountCount, setAccountCount] = useState(0);
 
   useEffect(() => {
     if (isLoading) return;
@@ -28,6 +33,10 @@ export default function DashboardPage() {
       return;
     }
     setStats(getDashboardStats());
+    if (isAdmin) {
+      setPendingCount(getPendingReviewProducts().length);
+      setAccountCount(getAllAccounts().length);
+    }
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading || !stats) {
@@ -90,6 +99,41 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Admin Quick Actions */}
+      {isAdmin && (pendingCount > 0 || accountCount > 0) && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+          {pendingCount > 0 && (
+            <Link href="/review" className="rounded-xl p-4 card-hover flex items-center gap-3" style={{ backgroundColor: '#D8431510', border: '1px solid #D8431530' }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#D8431520' }}>
+                <Clock size={20} style={{ color: '#D84315' }} />
+              </div>
+              <div>
+                <p className="text-lg font-bold" style={{ color: '#D84315' }}>{pendingCount}</p>
+                <p className="text-xs" style={{ color: '#6B6B6B' }}>待审核产品</p>
+              </div>
+            </Link>
+          )}
+          <Link href="/accounts" className="rounded-xl p-4 card-hover flex items-center gap-3" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E0D4' }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#B9975B15' }}>
+              <Users size={20} style={{ color: '#B9975B' }} />
+            </div>
+            <div>
+              <p className="text-lg font-bold" style={{ color: '#101010' }}>{accountCount}</p>
+              <p className="text-xs" style={{ color: '#6B6B6B' }}>账号管理</p>
+            </div>
+          </Link>
+          <Link href="/featured" className="rounded-xl p-4 card-hover flex items-center gap-3" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E0D4' }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#B9975B15' }}>
+              <Star size={20} style={{ color: '#B9975B' }} />
+            </div>
+            <div>
+              <p className="text-lg font-bold" style={{ color: '#101010' }}>优推</p>
+              <p className="text-xs" style={{ color: '#6B6B6B' }}>管理推荐商品</p>
+            </div>
+          </Link>
+        </div>
+      )}
 
       {/* Style Distribution */}
       <div className="grid md:grid-cols-2 gap-4 mb-6">

@@ -42,7 +42,7 @@ const DEFAULT_FORM: ProductFormData = {
 };
 
 export default function ProductEditPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user, isAdmin } = useAuth();
   const router = useRouter();
   const params = useParams();
   const productId = params?.id as string | undefined;
@@ -162,7 +162,7 @@ export default function ProductEditPage() {
       if (isEditing && productId) {
         updateProduct(productId, form, images, video);
       } else {
-        createProduct(form, images, video);
+        createProduct(form, images, video, user?.username || '', !isAdmin);
       }
       router.push('/products');
     } catch {
@@ -170,7 +170,7 @@ export default function ProductEditPage() {
     } finally {
       setSaving(false);
     }
-  }, [form, images, video, isEditing, productId, router]);
+  }, [form, images, video, isEditing, productId, router, user, isAdmin]);
 
   // ============ Drag & Drop for images ============
   const dragItem = useRef<number | null>(null);

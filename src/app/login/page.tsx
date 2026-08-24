@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 export default function LoginPage() {
   const { isAuthenticated, login } = useAuth();
   const router = useRouter();
-  const [phone, setPhone] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,12 +21,12 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!phone.trim() || !password.trim()) {
-      setError('请输入手机号和密码');
+    if (!username.trim() || !password.trim()) {
+      setError('请输入用户名和密码');
       return;
     }
     setLoading(true);
-    const result = login(phone.trim(), password);
+    const result = login(username.trim(), password);
     setLoading(false);
     if (result.success) {
       router.replace('/dashboard');
@@ -70,14 +70,13 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: '#101010' }}>
-                手机号
+                用户名
               </label>
               <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="请输入手机号"
-                maxLength={11}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="请输入用户名"
                 className="w-full px-3 py-2.5 rounded-lg text-sm outline-none transition-all focus:ring-2"
                 style={{
                   border: '1px solid #E8E0D4',
